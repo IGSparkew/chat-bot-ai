@@ -6,10 +6,12 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
+import { OpenApiGateway } from 'src/openApi/openApi.gateway';
 
-interface IMessage {
+export interface IMessage {
   username: string;
   content: string;
+  language: string;
   timeSent: string;
 }
 
@@ -17,8 +19,9 @@ interface IMessage {
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Socket;
+  chatGpt: OpenApiGateway;
 
-  clients: { client: Socket; username?: string }[] = [];
+  clients: { client: Socket; username?: string; language?: string}[] = [];
   chatMessages: IMessage[] = [];
 
   @SubscribeMessage('message')
@@ -29,13 +32,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('chat-message')
-  handleChatMessage(client: any, payload: IMessage): void {
+  async handleChatMessage(client: any, payload: IMessage): void {
     const c = this.clients.find((c) => c.client.id === client.id);
     if (c.username) {
+
+      if (c.language) {
+        await this.chatGpt.handleCallApi(c.language, payload);
+      }
+
       this.server.emit('chat-message', {
         ...payload,
         username: c.username,
       });
+   
       this.chatMessages.push({
         ...payload,
         username: c.username,
@@ -48,6 +57,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const c = this.clients.find((c) => c.client.id === client.id);
     if (c) {
       c.username = payload.username;
+    }
+  }
+
+  @SubscribeMessage('language-set')
+  handleLanguageSet(client: any, payload: any): void {
+    const c = this.clients.find((c) => c.client.id === client.id);
+    if (c) {
+      c.language = payload.language;
     }
   }
 
