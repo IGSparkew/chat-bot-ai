@@ -33,4 +33,7 @@ export class OpenApiGateway {
         }
         
     }
+
+
+    // Say yes or no if 'trad' is the translate of  
 }
