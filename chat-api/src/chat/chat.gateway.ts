@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -19,10 +20,11 @@ export interface IMessage {
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Socket;
-  chatGpt: OpenApiGateway;
 
   clients: { client: Socket; username?: string; language?: string}[] = [];
   chatMessages: IMessage[] = [];
+
+  constructor(private readonly chatBot:OpenApiGateway) {}
 
   @SubscribeMessage('message')
   handleMessage(client: any, payload: any): string {
@@ -32,12 +34,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('chat-message')
-  async handleChatMessage(client: any, payload: IMessage): void {
+  async handleChatMessage(client: any, payload: IMessage): Promise<void> {
     const c = this.clients.find((c) => c.client.id === client.id);
     if (c.username) {
-
+      
       if (c.language) {
-        await this.chatGpt.handleCallApi(c.language, payload);
+      let response = await this.chatBot.handleCallApi(c.language, payload);
+        
+        let chatPayload = {...payload};
+        chatPayload.content = response;
+        
+        this.server.emit('chat-message', {
+          ...chatPayload,
+          username: c.username
+        });
       }
 
       this.server.emit('chat-message', {
