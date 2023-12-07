@@ -1,14 +1,20 @@
 import { HttpService } from "@nestjs/axios";
 import { Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { IMessage } from "src/chat/chat.gateway";
 
 @Injectable()
 export class OpenApiGateway { 
-    constructor(private readonly httpService:HttpService) {}
+    constructor(private readonly httpService:HttpService, private readonly configService:ConfigService) {}
 
     async handleCallApi(language: string, message: IMessage) {
+       const traduction = await this.callApi(`translate the following text into ${language} : ${message.content}`);        
+        
+       const isValid = await this.handleCheckTraduction(message.content, traduction, language);
 
-       return await this.callApi(`translate the following text into ${language} : ${message.content}`);        
+       if (isValid) return traduction;
+
+       return message.content;
     }
 
     async handleCheckTraduction(original: string, traduction: string, language: string): Promise<boolean> {
@@ -20,7 +26,7 @@ export class OpenApiGateway {
     }
 
     private async callApi(prompt: string) {
-        const response = await this.httpService.axiosRef.post('https://booty-somewhat-tooth-rr.trycloudflare.com/api/v1/generate', {
+        const response = await this.httpService.axiosRef.post(this.configService.get("API_URL"), {
             max_context_length: 1600,
             max_length: 120,
             prompt: `### Instruction: ${prompt} ### Response:`,
