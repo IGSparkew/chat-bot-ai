@@ -22,9 +22,9 @@ const Traduction = ({ socket, messageId }: Props) => {
      <select onChange={(e) => setText(e.target.value)} defaultValue={"french"}>
      <option value={"english"}>english</option>
       <option value={"french"}>french</option>
-      <option value={"spain"}>spain</option>
+      <option value={"spanish"}>spain</option>
     </select>
-    <button type="submit">submit</button>
+    <button type="submit">traduction</button>
     </form>
   );
 };

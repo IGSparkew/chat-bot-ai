@@ -46,18 +46,18 @@ const Chat = () => {
   return (
     <div>
       <h1>Chat</h1>
+      <Messages socket={socket} messages={messages} username={username}/>
       {
         !hadUsername && <Username socket={socket} setUsername={setUsername} />
       }
       {
-        hadUsername && <h2>Username: {username}</h2>
+        hadUsername && <h2 className="sticky bottom-0">Username: {username}</h2>
       }
 
       { 
         hadUsername && <SendMessage socket={socket} username={username} />
       }
       
-       <Messages socket={socket} messages={messages} username={username}/>
     
 
       

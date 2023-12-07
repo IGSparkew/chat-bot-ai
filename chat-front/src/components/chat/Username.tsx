@@ -22,6 +22,7 @@ const Username = ({ socket, setUsername }: Props) => {
       <input
         type="text"
         value={text}
+        placeholder="Username....."
         onChange={(e) => setText(e.target.value)}
       />
       <button type="submit">Submit</button>

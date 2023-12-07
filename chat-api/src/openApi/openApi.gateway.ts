@@ -1,4 +1,4 @@
-import { HttpModule, HttpService } from "@nestjs/axios";
+import { HttpService } from "@nestjs/axios";
 import { Injectable } from "@nestjs/common";
 import { IMessage } from "src/chat/chat.gateway";
 
@@ -7,10 +7,23 @@ export class OpenApiGateway {
     constructor(private readonly httpService:HttpService) {}
 
     async handleCallApi(language: string, message: IMessage) {
-       const response = await this.httpService.axiosRef.post('https://packard-performs-parks-gt.trycloudflare.com/api/v1/generate', {
+
+       return await this.callApi(`translate the following text into ${language} : ${message.content}`);        
+    }
+
+    async handleCheckTraduction(original: string, traduction: string, language: string): Promise<boolean> {
+        const response = await this.callApi(`say yes or no if ${traduction} is the translated word of ${origin} in ${language}`) as string;
+        if (response) {
+            return response.toLocaleLowerCase().includes("yes");
+        }
+    
+    }
+
+    private async callApi(prompt: string) {
+        const response = await this.httpService.axiosRef.post('https://booty-somewhat-tooth-rr.trycloudflare.com/api/v1/generate', {
             max_context_length: 1600,
             max_length: 120,
-            prompt: `### Instruction: translate the following text into ${language} : ${message.content} ### Response: `,
+            prompt: `### Instruction: ${prompt} ### Response:`,
             quiet: false,
             rep_pen: 1.1,
             rep_pen_range: 256,
@@ -23,7 +36,6 @@ export class OpenApiGateway {
             typical: 1
         });
 
-        
         console.log(response.data);
 
         if (response.data && response.data.results) {
@@ -31,8 +43,11 @@ export class OpenApiGateway {
                 return response.data.results[0].text;
             }
         }
-        
+
+        return response;
     }
+    
+    
 
 
     // Say yes or no if 'trad' is the translate of  

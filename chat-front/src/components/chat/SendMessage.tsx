@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Socket } from "socket.io-client";
+import {v4 as uuidv4} from 'uuid';
 
 interface Props {
   socket: Socket;
@@ -16,12 +17,13 @@ const SendMessage = ({ socket, username }: Props) => {
       username,
       content: text,
       timeSent: new Date().toISOString(),
-      id:Math.random(),
+      id:uuidv4,
     });
 
     setText("");
   };
   return (
+    <footer className="sticky bottom-0">
     <form onSubmit={handleSubmit}>
       <input
         type="text"
@@ -30,6 +32,7 @@ const SendMessage = ({ socket, username }: Props) => {
       />
       <button type="submit">Submit</button>
     </form>
+    </footer>
   );
 };
 

@@ -37,7 +37,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleChatMessage(client: any, payload: IMessage): Promise<void> {
     const c = this.clients.find((c) => c.client.id === client.id);
     if (c.username) {
-
       this.server.emit('chat-message', {
         ...payload,
         username: c.username,
@@ -60,11 +59,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('language-set')
   async handleLanguageSet(client: any, payload: any) {
-    const c = this.clients.find((c) => c.client.id === client.id);
     const message = this.chatMessages.find((m) => m.id == payload.messageId)
     if (message) {
       let response = await this.chatBot.handleCallApi(payload.language, message);
-      message.content = response;
+      //message.content = response;
       console.log(this.chatMessages);
       client.emit('message-trad', {
         id: message.id,
