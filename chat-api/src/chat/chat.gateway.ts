@@ -12,8 +12,8 @@ import { OpenApiGateway } from 'src/openApi/openApi.gateway';
 export interface IMessage {
   username: string;
   content: string;
-  language: string;
   timeSent: string;
+  id:number;
 }
 
 @WebSocketGateway({ cors: true })
@@ -37,18 +37,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleChatMessage(client: any, payload: IMessage): Promise<void> {
     const c = this.clients.find((c) => c.client.id === client.id);
     if (c.username) {
-      
-      if (c.language) {
-      let response = await this.chatBot.handleCallApi(c.language, payload);
-        
-        let chatPayload = {...payload};
-        chatPayload.content = response;
-        
-        this.server.emit('chat-message', {
-          ...chatPayload,
-          username: c.username
-        });
-      }
 
       this.server.emit('chat-message', {
         ...payload,
@@ -71,11 +59,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('language-set')
-  handleLanguageSet(client: any, payload: any): void {
+  async handleLanguageSet(client: any, payload: any) {
     const c = this.clients.find((c) => c.client.id === client.id);
-    if (c) {
-      c.language = payload.language;
+    const message = this.chatMessages.find((m) => m.id == payload.messageId)
+    if (message) {
+      let response = await this.chatBot.handleCallApi(payload.language, message);
+      message.content = response;
+      console.log(this.chatMessages);
+      client.emit('message-trad', {
+        id: message.id,
+        content: response
+      });
     }
+
+
   }
 
   handleConnection(client: Socket) {

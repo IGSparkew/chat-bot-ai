@@ -1,15 +1,20 @@
+import { Socket } from "socket.io-client";
+import Traduction from "./Traduction";
+
 export interface IMessage {
   username: string;
   content: string;
   timeSent: string;
+  id:number;
 }
 
 interface Props {
   message: IMessage;
   isMe: boolean;
+  socket: Socket;
 }
 
-const Message = ({ message, isMe }: Props) => {
+const Message = ({ message, isMe, socket }: Props) => {
   return (
     <div className={`chat ${isMe ? "chat-end" : "chat-start"}`}>
       <div className="chat-header">
@@ -22,6 +27,9 @@ const Message = ({ message, isMe }: Props) => {
         }`}
       >
         {message.content}
+      <div>
+        <Traduction socket={socket} messageId={message.id} />
+      </div>
       </div>
     </div>
   );

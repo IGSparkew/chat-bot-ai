@@ -16,6 +16,7 @@ const SendMessage = ({ socket, username }: Props) => {
       username,
       content: text,
       timeSent: new Date().toISOString(),
+      id:Math.random(),
     });
 
     setText("");
