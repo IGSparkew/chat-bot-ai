@@ -1,10 +1,12 @@
 import { Socket } from "socket.io-client";
 import Traduction from "./Traduction";
+import InfoMessage from "./InfoMessage";
 
 export interface IMessage {
   username: string;
   content: string;
   timeSent: string;
+  info: string;
   id:number;
 }
 
@@ -29,6 +31,9 @@ const Message = ({ message, isMe, socket }: Props) => {
         {message.content}
       <div>
         <Traduction socket={socket} messageId={message.id} />
+      </div>
+      <div>
+        <InfoMessage contentInfo={message.info} />
       </div>
       </div>
     </div>

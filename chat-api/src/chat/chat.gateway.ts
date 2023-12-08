@@ -13,6 +13,7 @@ export interface IMessage {
   username: string;
   content: string;
   timeSent: string;
+  info:string;
   id:number;
 }
 
@@ -37,11 +38,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleChatMessage(client: any, payload: IMessage): Promise<void> {
     const c = this.clients.find((c) => c.client.id === client.id);
     if (c.username) {
+      if (!payload.info) {
+        console.log("test");
+        payload.info = await this.chatBot.handleCheckData(payload.content);
+      }
+
       this.server.emit('chat-message', {
         ...payload,
         username: c.username,
       });
-   
+
+         
       this.chatMessages.push({
         ...payload,
         username: c.username,
@@ -57,20 +64,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  @SubscribeMessage('language-set')
-  async handleLanguageSet(client: any, payload: any) {
-    const message = this.chatMessages.find((m) => m.id == payload.messageId)
+  @SubscribeMessage('traduction')
+  async handleTraductionSet(client: any, payload: any) {
+    const message = this.chatMessages.find((m) => m.id === payload.messageId)
     if (message) {
-      let response = await this.chatBot.handleCallApi(payload.language, message);
-      //message.content = response;
-      console.log(this.chatMessages);
+      let response = await this.chatBot.handleTraduction(payload.language, message);
       client.emit('message-trad', {
         id: message.id,
         content: response
       });
     }
-
-
   }
 
   handleConnection(client: Socket) {

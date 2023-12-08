@@ -7,22 +7,15 @@ import { IMessage } from "src/chat/chat.gateway";
 export class OpenApiGateway { 
     constructor(private readonly httpService:HttpService, private readonly configService:ConfigService) {}
 
-    async handleCallApi(language: string, message: IMessage) {
-       const traduction = await this.callApi(`translate the following text into ${language} : ${message.content}`);        
-        
-       const isValid = await this.handleCheckTraduction(message.content, traduction, language);
-
-       if (isValid) return traduction;
-
-       return message.content;
+    async handleTraduction(language: string, message: IMessage) {
+       return await this.callApi(`translate the following text into ${language} : ${message.content}`);        
     }
 
-    async handleCheckTraduction(original: string, traduction: string, language: string): Promise<boolean> {
-        const response = await this.callApi(`say yes or no if ${traduction} is the translated word of ${origin} in ${language}`) as string;
-        if (response) {
-            return response.toLocaleLowerCase().includes("yes");
+    async handleCheckData(content: string): Promise<string> {
+        const response = await this.callApi(`is the phrase '${content}' correct and not misleading? `) as string;
+        if (response.includes("not correct") || !response.includes("not misleading")) {
+            return response;
         }
-    
     }
 
     private async callApi(prompt: string) {
@@ -56,5 +49,5 @@ export class OpenApiGateway {
     
 
 
-    // Say yes or no if 'trad' is the translate of  
+    // 'data' is valid ?   
 }

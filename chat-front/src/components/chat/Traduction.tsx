@@ -11,7 +11,7 @@ const Traduction = ({ socket, messageId }: Props) => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    socket.emit("language-set", {
+    socket.emit("traduction", {
       language: text,
       messageId: messageId
     });
