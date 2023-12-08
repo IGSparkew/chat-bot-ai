@@ -12,17 +12,25 @@ export class OpenApiGateway {
     }
 
     async handleCheckData(content: string): Promise<string> {
-        const response = await this.callApi(`is the phrase '${content}' correct and not misleading? `) as string;
-        if (response.includes("not correct") || !response.includes("not misleading")) {
-            return response;
-        }
+        return await this.callApi(`is the phrase '${content}' correct and not misleading? `) as string;
     }
 
-    private async callApi(prompt: string) {
+    async handleSuggest(messages: IMessage[]) {
+        return await this.callApi(`suggest a sententce for a chat`, messages);
+    }
+
+    private async callApi(prompt: string, context: IMessage[] = []) {
+        let before = ""
+        if (context) {
+            context.forEach((c) => {
+                before += c.username + ": " + c.content + " "
+            })
+        }
+        
         const response = await this.httpService.axiosRef.post(this.configService.get("API_URL"), {
             max_context_length: 1600,
             max_length: 120,
-            prompt: `### Instruction: ${prompt} ### Response:`,
+            prompt: `${before} ### Instruction: ${prompt} ### Response:`,
             quiet: false,
             rep_pen: 1.1,
             rep_pen_range: 256,

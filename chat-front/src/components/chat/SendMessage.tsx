@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
 import {v4 as uuidv4} from 'uuid';
 
@@ -10,6 +10,13 @@ interface Props {
 
 const SendMessage = ({ socket, username }: Props) => {
   const [text, setText] = useState("");
+  const [isSuggestion, setSuggestion] = useState(false);
+
+  useEffect(() => {
+    socket.on("chat-suggest", (response) => {
+      setText(response.data);
+    })
+  },[]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -23,6 +30,17 @@ const SendMessage = ({ socket, username }: Props) => {
 
     setText("");
   };
+
+  const handleSuggest = () => {
+    setSuggestion(true);
+    socket.emit("user-suggest");
+  }
+
+  const handleRemoveSuggest = () => {
+    setSuggestion(false);
+    setText("");
+  }
+
   return (
     <footer className="sticky bottom-0">
     <form onSubmit={handleSubmit}>
@@ -31,7 +49,14 @@ const SendMessage = ({ socket, username }: Props) => {
         value={text}
         onChange={(e) => setText(e.target.value)}
       />
-      <button type="submit">Submit</button>
+      <button type="submit" className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mx-1">Submit</button>
+      {
+        !isSuggestion && <button type="button" onClick={handleSuggest} className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mx-1">suggest-me</button>
+      }
+
+      {
+        isSuggestion && <button type="button" onClick={handleRemoveSuggest} className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mx-1">remove-suggestion</button>
+      }
     </form>
     </footer>
   );

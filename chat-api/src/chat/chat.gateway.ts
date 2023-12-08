@@ -39,7 +39,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const c = this.clients.find((c) => c.client.id === client.id);
     if (c.username) {
       if (!payload.info) {
-        console.log("test");
         payload.info = await this.chatBot.handleCheckData(payload.content);
       }
 
@@ -74,6 +73,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         content: response
       });
     }
+  }
+
+  @SubscribeMessage('user-suggest')
+  async handleSuggestion(client:any) {
+    const response = await this.chatBot.handleSuggest(this.chatMessages) as string;
+    console.log(response.replaceAll('"', ' '));
+    client.emit('chat-suggest', {
+      data: response.replaceAll('"', ' ')
+    })
   }
 
   handleConnection(client: Socket) {

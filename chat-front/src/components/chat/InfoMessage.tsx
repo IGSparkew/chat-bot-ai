@@ -10,7 +10,7 @@ const InfoMessage = ({contentInfo}: Props) => {
     const [showInfo, setShowInfo] = useState(false);
 
     return (
-        <a onClick={(e) => setShowInfo((shi) => !shi)}>
+        <a onClick={() => setShowInfo((shi) => !shi)}>
             {
                 !showInfo && contentInfo && <div className="bg-gray-500 flex flex-row-reverse">  
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-white">
