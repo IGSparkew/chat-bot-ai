@@ -43,7 +43,6 @@ export class OpenApiGateway {
             typical: 1
         });
 
-        console.log(response.data);
 
         if (response.data && response.data.results) {
             if (response.data.results[0].text) {
@@ -54,8 +53,4 @@ export class OpenApiGateway {
         return response;
     }
     
-    
-
-
-    // 'data' is valid ?   
 }

@@ -30,10 +30,10 @@ const Message = ({ message, isMe, socket }: Props) => {
       >
         {message.content}
       <div>
-        <Traduction socket={socket} messageId={message.id} />
+        <InfoMessage contentInfo={message.info} />
       </div>
       <div>
-        <InfoMessage contentInfo={message.info} />
+        <Traduction socket={socket} messageId={message.id} />
       </div>
       </div>
     </div>

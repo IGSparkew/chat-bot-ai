@@ -78,7 +78,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('user-suggest')
   async handleSuggestion(client:any) {
     const response = await this.chatBot.handleSuggest(this.chatMessages) as string;
-    console.log(response.replaceAll('"', ' '));
     client.emit('chat-suggest', {
       data: response.replaceAll('"', ' ')
     })
